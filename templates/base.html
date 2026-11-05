@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}15-Puzzle AI Solver{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+
+<header class="navbar">
+    <a href="{{ url_for('home') }}" class="brand">
+        <span class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            </svg>
+        </span>
+        <span class="brand-text">15-Puzzle AI</span>
+    </a>
+
+    <nav class="nav-links">
+        <a href="{{ url_for('home') }}" class="nav-link {% if active_page == 'home' %}active{% endif %}">Home</a>
+        <a href="{{ url_for('solver_page') }}" class="nav-link {% if active_page == 'solver' %}active{% endif %}">Solver</a>
+        <a href="{{ url_for('algorithm_page') }}" class="nav-link {% if active_page == 'algorithm' %}active{% endif %}">Algorithm</a>
+        <a href="{{ url_for('about_page') }}" class="nav-link {% if active_page == 'about' %}active{% endif %}">About</a>
+    </nav>
+
+    <div class="engine-badge" id="engineStatusBadge" title="Backend Flask Status">
+        <span class="status-dot"></span>
+        <span class="status-text" id="engineStatusText">AI Engine Ready</span>
+    </div>
+</header>
+
+<main class="page-container">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-left">
+        <strong>15-Puzzle AI</strong>
+        <span class="divider">|</span>
+        <span>HTML</span>
+        <span>CSS</span>
+        <span>JavaScript</span>
+        <span>Python Flask</span>
+    </div>
+    <div class="footer-right">
+        <span>Built for AI Learning 💙</span>
+    </div>
+</footer>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

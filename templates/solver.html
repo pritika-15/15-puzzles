@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}15-Puzzle AI Solver - Interactive Solver View{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="breadcrumb">
+        <a href="{{ url_for('home') }}">Home</a> / <span>Solver</span>
+    </div>
+    <h1>15-Puzzle Interactive Solver</h1>
+    <p class="subtitle">Play manually, test custom configurations, or let the IDA* AI algorithm compute the optimal move sequence.</p>
+</section>
+
+<!-- Difficulty / Preset Bar -->
+<div class="difficulty-bar">
+    <span class="difficulty-label">Shuffle Difficulty:</span>
+    <div class="difficulty-options">
+        <button class="diff-btn" onclick="shuffleWithDepth(8)">🟢 Easy (8 moves)</button>
+        <button class="diff-btn active" onclick="shuffleWithDepth(16)">🟡 Medium (16 moves)</button>
+        <button class="diff-btn" onclick="shuffleWithDepth(24)">🔴 Hard (24 moves)</button>
+        <button class="diff-btn" onclick="shufflePuzzle()">🎲 Random Walk</button>
+    </div>
+</div>
+
+<section class="dashboard">
+
+    <!-- Card 1: 15-Puzzle Solver -->
+    <article class="card solver-card" id="solver">
+        <div class="card-header">
+            <span class="card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1769e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                </svg>
+            </span>
+            <h2>15-Puzzle Solver</h2>
+        </div>
+
+        <div class="puzzle-board" id="puzzleBoard" tabindex="0" aria-label="15-puzzle grid. Use clicks or arrow keys to move tiles."></div>
+
+        <div class="controls">
+            <!-- Row 1: Primary Actions -->
+            <div class="control-row row-2">
+                <button class="primary-btn" onclick="shufflePuzzle()">
+                    <span class="btn-icon">🔀</span> Shuffle
+                </button>
+                <button class="primary-btn solve-btn" id="solveBtn" onclick="solvePuzzle()">
+                    <span class="btn-icon">🧠</span> Solve with AI
+                </button>
+            </div>
+
+            <!-- Row 2: Playback Controls -->
+            <div class="control-row row-2">
+                <button class="btn-subtle" onclick="playSolution()">
+                    <span class="btn-icon">▶</span> Animate Solution
+                </button>
+                <button class="btn-subtle" onclick="pauseSolution()">
+                    <span class="btn-icon">⏸</span> Pause
+                </button>
+            </div>
+
+            <!-- Row 3: Step Controls -->
+            <div class="control-row row-3">
+                <button class="btn-subtle" onclick="previousMove()">
+                    ← Previous
+                </button>
+                <button class="btn-subtle" onclick="nextMove()">
+                    Next →
+                </button>
+                <button class="btn-subtle" onclick="resetPuzzle()">
+                    ↻ Reset
+                </button>
+            </div>
+
+            <!-- Row 4: Utility Controls -->
+            <div class="control-row row-utility">
+                <button class="btn-subtle new-game-btn" onclick="newGame()">
+                    + New Game
+                </button>
+                <div class="speed-inline">
+                    <label for="speed">Speed:</label>
+                    <select id="speed">
+                        <option value="1000">Slow</option>
+                        <option value="450" selected>Normal</option>
+                        <option value="120">Fast</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-container">
+            <p id="status" role="status">Ready to solve!</p>
+        </div>
+    </article>
+
+    <!-- Card 2: AI Performance & Solution Moves -->
+    <article class="card performance-card" id="performance">
+        <div class="card-header">
+            <span class="card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1769e8" stroke-width="2.2">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+            </span>
+            <h2>AI Performance</h2>
+        </div>
+
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-top">
+                    <span class="metric-icon">🔄</span>
+                    <p>Optimal Moves</p>
+                </div>
+                <h3 id="moves">0</h3>
+            </div>
+
+            <div class="metric">
+                <div class="metric-top">
+                    <span class="metric-icon">🕸️</span>
+                    <p>Search Nodes</p>
+                </div>
+                <h3 id="nodes">0</h3>
+            </div>
+
+            <div class="metric">
+                <div class="metric-top">
+                    <span class="metric-icon">⏱️</span>
+                    <p>Search Time</p>
+                </div>
+                <h3 id="time">0.00 s</h3>
+            </div>
+
+            <div class="metric">
+                <div class="metric-top">
+                    <span class="metric-icon">📏</span>
+                    <p>Initial Manhattan</p>
+                </div>
+                <h3 id="distance">0</h3>
+            </div>
+        </div>
+
+        <div class="info-list">
+            <div class="info-row">
+                <span class="info-label">Algorithm</span>
+                <span class="info-value highlight">IDA*</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Heuristic</span>
+                <span class="info-value">Manhattan Distance</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Current State</span>
+                <span class="state-pill ready" id="statePill">● Ready</span>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-labels">
+                <span>Progress</span>
+                <span id="progress">0 / 0 moves</span>
+            </div>
+            <div class="progress-track">
+                <div id="progressBar"></div>
+            </div>
+            <div class="distance-live">
+                <span>Current Manhattan Distance</span>
+                <strong id="currentDistance">0</strong>
+            </div>
+        </div>
+
+        <!-- Step By Step Move Log -->
+        <div class="moves-log-container">
+            <h4>Step-by-Step Move Log</h4>
+            <div class="moves-log" id="movesLog">
+                <p class="empty-log-msg">Solve the puzzle to generate the move-by-move sequence.</p>
+            </div>
+        </div>
+    </article>
+
+</section>
+{% endblock %}

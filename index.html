@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15-Puzzle AI Solver - College Project</title>
+    <!-- Modern clean typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="#home" class="logo">
+                <div class="logo-icon">
+                    <span class="logo-tile">1</span>
+                    <span class="logo-tile">5</span>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">15-Puzzle AI</span>
+                    <span class="logo-badge">Solver</span>
+                </div>
+            </a>
+
+            <nav class="nav-links">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#solver" class="nav-link">Solver</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="#algorithm" class="nav-link">Algorithm</a>
+            </nav>
+
+            <a href="#solver" class="nav-cta">Try Solver</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- 2. Hero Section -->
+        <section class="hero-section" id="home">
+            <div class="hero-container">
+                <div class="hero-text">
+                    <div class="hero-badge">
+                        <span class="badge-dot"></span>
+                        Artificial Intelligence Project
+                    </div>
+                    <h1 class="hero-title">Challenge the Puzzle.<br><span class="highlight">Let AI Solve It.</span></h1>
+                    <p class="hero-desc">
+                        Explore intelligent state-space search for the classic 15-puzzle. Shuffle the board, observe the Manhattan Distance heuristic in real time, and let IDA* compute the optimal sequence of moves.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#solver" class="btn btn-primary btn-large">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            Start Playing
+                        </a>
+                        <a href="#algorithm" class="btn btn-secondary btn-large">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                            Explore Algorithm
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Small Puzzle Illustration -->
+                <div class="hero-visual">
+                    <div class="illustration-card">
+                        <div class="card-caption">Target Solved State</div>
+                        <div class="mini-grid">
+                            <div class="mini-tile">1</div>
+                            <div class="mini-tile">2</div>
+                            <div class="mini-tile">3</div>
+                            <div class="mini-tile">4</div>
+                            <div class="mini-tile">5</div>
+                            <div class="mini-tile">6</div>
+                            <div class="mini-tile">7</div>
+                            <div class="mini-tile">8</div>
+                            <div class="mini-tile">9</div>
+                            <div class="mini-tile">10</div>
+                            <div class="mini-tile">11</div>
+                            <div class="mini-tile">12</div>
+                            <div class="mini-tile">13</div>
+                            <div class="mini-tile">14</div>
+                            <div class="mini-tile">15</div>
+                            <div class="mini-tile mini-empty"></div>
+                        </div>
+                        <div class="illustration-footer">
+                            <span class="status-indicator-dot"></span>
+                            4×4 Goal Configuration (1–15)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Puzzle Solver Section -->
+        <section class="solver-section" id="solver">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">Interactive Environment</span>
+                    <h2 class="section-title">15-Puzzle Solver</h2>
+                    <p class="section-subtitle">Click adjacent tiles or use your keyboard arrow keys to move. Shuffle and test the AI solver.</p>
+                </div>
+
+                <div class="solver-layout">
+                    <!-- Left: The Interactive 4x4 Puzzle Board -->
+                    <div class="board-column">
+                        <div class="board-card">
+                            <div class="board-card-header">
+                                <div class="board-status-info">
+                                    <span class="status-label">Status:</span>
+                                    <span class="status-message" id="statusMessage">Board ready. Click any adjacent tile to move.</span>
+                                </div>
+                                <div class="move-counter-pill">
+                                    <span class="pill-label">Player Moves:</span>
+                                    <span class="pill-value" id="playerMoves">0</span>
+                                </div>
+                            </div>
+
+                            <!-- 4x4 Grid Board -->
+                            <div class="puzzle-container">
+                                <div class="puzzle-grid" id="puzzleGrid" tabindex="0" aria-label="15-puzzle grid. Click tiles or use arrow keys to slide tiles into the empty space.">
+                                    <!-- 16 tiles rendered dynamically via JavaScript -->
+                                </div>
+                            </div>
+
+                            <!-- Solution Playback Progress Bar -->
+                            <div class="solution-progress-box">
+                                <div class="progress-labels">
+                                    <span class="progress-title">AI Solution Playback</span>
+                                    <span class="progress-step-text" id="solutionStepText">Step 0 / 0</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div class="progress-fill" id="progressFill"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Control Panel -->
+                    <div class="controls-column">
+                        <div class="controls-card">
+                            <h3 class="controls-card-title">Solver Controls</h3>
+                            <p class="controls-card-desc">Operate the puzzle and run the AI pathfinder.</p>
+
+                            <!-- Primary Actions -->
+                            <div class="control-group">
+                                <label class="group-label">Primary Actions</label>
+                                <div class="btn-grid-2">
+                                    <button class="btn btn-primary" id="shuffleBtn">
+                                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="16 3 21 3 21 8"></polyline>
+                                            <line x1="4" y1="20" x2="21" y2="3"></line>
+                                            <polyline points="21 16 21 21 16 21"></polyline>
+                                            <line x1="15" y1="15" x2="21" y2="21"></line>
+                                            <line x1="4" y1="4" x2="9" y2="9"></line>
+                                        </svg>
+                                        Shuffle
+                                    </button>
+                                    <button class="btn btn-primary btn-accent" id="solveBtn">
+                                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 2a9 9 0 0 1 9 9v1a9 9 0 0 1-9 9 9 9 0 0 1-9-9V11a9 9 0 0 1 9-9z"></path>
+                                            <circle cx="9" cy="12" r="1.5"></circle>
+                                            <circle cx="15" cy="12" r="1.5"></circle>
+                                            <path d="M10 16s1 1 2 1 2-1 2-1"></path>
+                                        </svg>
+                                        Solve with AI
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Playback Actions -->
+                            <div class="control-group">
+                                <label class="group-label">Animation Controls</label>
+                                <div class="btn-grid-2">
+                                    <button class="btn btn-outline" id="playBtn" disabled>
+                                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                        </svg>
+                                        Animate Solution
+                                    </button>
+                                    <button class="btn btn-outline" id="pauseBtn" disabled>
+                                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="6" y="4" width="4" height="16"></rect>
+                                            <rect x="14" y="4" width="4" height="16"></rect>
+                                        </svg>
+                                        Pause
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Step Controls -->
+                            <div class="control-group">
+                                <label class="group-label">Step Navigation & Reset</label>
+                                <div class="btn-grid-3">
+                                    <button class="btn btn-subtle" id="prevBtn" disabled>
+                                        ← Previous
+                                    </button>
+                                    <button class="btn btn-subtle" id="nextBtn" disabled>
+                                        Next →
+                                    </button>
+                                    <button class="btn btn-subtle" id="resetBtn">
+                                        ↻ Reset
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Speed Settings & Hint -->
+                            <div class="control-footer">
+                                <div class="speed-selector">
+                                    <label for="speedSelect" class="speed-label">Playback Speed:</label>
+                                    <select id="speedSelect" class="speed-dropdown">
+                                        <option value="600">Slow (600ms)</option>
+                                        <option value="350" selected>Normal (350ms)</option>
+                                        <option value="180">Fast (180ms)</option>
+                                    </select>
+                                </div>
+                                <div class="keyboard-hint">
+                                    💡 <span><strong>Tip:</strong> You can also use keyboard Arrow Keys (↑, ↓, ←, →) to slide tiles into the empty space.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. AI Performance Dashboard -->
+        <section class="dashboard-section" id="dashboard">
+            <div class="section-container">
+                <div class="section-header">
+                    <div class="dashboard-badge-row">
+                        <span class="section-tag">Performance Analytics</span>
+                        <span class="preview-tag">
+                            <span class="preview-badge-dot"></span>
+                            Visual Preview & Live Metrics
+                        </span>
+                    </div>
+                    <h2 class="section-title">AI Performance Dashboard</h2>
+                    <p class="section-subtitle">Real-time heuristic evaluation combined with benchmark metrics from the IDA* search algorithm.</p>
+                </div>
+
+                <!-- 4 Metric Cards -->
+                <div class="metrics-grid">
+                    <!-- Metric 1: Optimal Moves -->
+                    <div class="metric-card">
+                        <div class="metric-icon-wrap">
+                            <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                            </svg>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-header-line">
+                                <span class="metric-title">Optimal Moves</span>
+                                <span class="metric-badge-type">AI Result</span>
+                            </div>
+                            <div class="metric-value-row">
+                                <span class="metric-number" id="metricMoves">—</span>
+                                <span class="metric-unit">moves</span>
+                            </div>
+                            <p class="metric-description">Length of shortest path found to reach target state.</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon-wrap">
+                            <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-header-line">
+                                <span class="metric-title">Search Nodes</span>
+                                <span class="metric-badge-type preview-badge">Sample Preview</span>
+                            </div>
+                            <div class="metric-value-row">
+                                <span class="metric-number" id="metricNodes">12,480</span>
+                                <span class="metric-unit">nodes</span>
+                            </div>
+                            <p class="metric-description">Sample explored state count under IDA* pruning.</p>
+                        </div>
+                    </div>
+
+                   
+                    <div class="metric-card">
+                        <div class="metric-icon-wrap">
+                            <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-header-line">
+                                <span class="metric-title">Search Time</span>
+                                <span class="metric-badge-type preview-badge">Sample Preview</span>
+                            </div>
+                            <div class="metric-value-row">
+                                <span class="metric-number" id="metricTime">0.145</span>
+                                <span class="metric-unit">sec</span>
+                            </div>
+                            <p class="metric-description">Benchmark CPU execution time for iterative deepening.</p>
+                        </div>
+                    </div>
+
+                   
+                    <div class="metric-card metric-card-live">
+                        <div class="metric-icon-wrap">
+                            <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="3" y1="9" x2="21" y2="9"></line>
+                                <line x1="9" y1="21" x2="9" y2="9"></line>
+                            </svg>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-header-line">
+                                <span class="metric-title">Manhattan Distance</span>
+                                <span class="metric-badge-type live-badge">Live Value h(n)</span>
+                            </div>
+                            <div class="metric-value-row">
+                                <span class="metric-number" id="metricDistance">0</span>
+                                <span class="metric-unit">steps away</span>
+                            </div>
+                            <p class="metric-description">Real-time computed sum of grid distances from current board to goal.</p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="dashboard-disclaimer">
+                    <span class="disclaimer-icon">ℹ️</span>
+                    <span>
+                        <strong>Note for Presentation:</strong> The <em>Search Nodes</em> and <em>Search Time</em> display benchmark sample metrics representing typical IDA* performance, while <em>Manhattan Distance</em> is calculated dynamically from the current live board state.
+                    </span>
+                </div>
+            </div>
+        </section>
+
+   
+        <section class="how-it-works-section" id="how-it-works">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">Workflow Overview</span>
+                    <h2 class="section-title">How It Works</h2>
+                    <p class="section-subtitle">Solving the 15-puzzle with AI follows three systematic, logical stages.</p>
+                </div>
+
+                <div class="steps-grid">
+                   
+                    <div class="step-card">
+                        <div class="step-number">01</div>
+                        <div class="step-icon-wrap">
+                            <svg class="step-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="16 3 21 3 21 8"></polyline>
+                                <line x1="4" y1="20" x2="21" y2="3"></line>
+                                <polyline points="21 16 21 21 16 21"></polyline>
+                                <line x1="15" y1="15" x2="21" y2="21"></line>
+                                <line x1="4" y1="4" x2="9" y2="9"></line>
+                            </svg>
+                        </div>
+                        <h3 class="step-title">1. Shuffle the Puzzle</h3>
+                        <p class="step-desc">
+                            The board is scrambled through random legal transitions from the solved state. This guarantees mathematical solvability while creating a challenging search space.
+                        </p>
+                    </div>
+
+                    
+                    <div class="step-card">
+                        <div class="step-number">02</div>
+                        <div class="step-icon-wrap">
+                            <svg class="step-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                        <h3 class="step-title">2. Run Intelligent Search</h3>
+                        <p class="step-desc">
+                            The AI initializes IDA* (Iterative Deepening A*). Using the admissible Manhattan Distance heuristic, it traverses game trees without memory blowup, pruning sub-optimal branches.
+                        </p>
+                    </div>
+
+                    
+                    <div class="step-card">
+                        <div class="step-number">03</div>
+                        <div class="step-icon-wrap">
+                            <svg class="step-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                        </div>
+                        <h3 class="step-title">3. Watch the Solution</h3>
+                        <p class="step-desc">
+                            Once the target path is confirmed, the frontend visually animates every individual tile slide, allowing you to observe, pause, or step through the optimal solution.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+        <section class="algorithm-section" id="algorithm">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">Core Concepts</span>
+                    <h2 class="section-title">Algorithm Explanation</h2>
+                    <p class="section-subtitle">Understanding the heuristic evaluation function and search mechanics behind optimal 15-puzzle solving.</p>
+                </div>
+
+                <div class="formula-banner">
+                    <div class="formula-intro">Heuristic Evaluation Function:</div>
+                    <div class="formula-code">f(n) = g(n) + h(n)</div>
+                    <div class="formula-breakdown">
+                        <div class="formula-term">
+                            <span class="term-name">g(n)</span>
+                            <span class="term-desc">Actual cost (number of sliding moves) incurred from the start state to node <strong>n</strong>.</span>
+                        </div>
+                        <div class="formula-term">
+                            <span class="term-name">h(n)</span>
+                            <span class="term-desc">Heuristic estimate: Total Manhattan Distance from node <strong>n</strong> to the goal configuration.</span>
+                        </div>
+                        <div class="formula-term">
+                            <span class="term-name">f(n)</span>
+                            <span class="term-desc">Total estimated path cost through node <strong>n</strong> to the final solved goal.</span>
+                        </div>
+                    </div>
+                </div>
+
+               
+                <div class="algo-details-grid">
+                    <div class="algo-card">
+                        <div class="algo-card-badge">Search Strategy</div>
+                        <h3 class="algo-card-title">IDA* (Iterative Deepening A*)</h3>
+                        <p class="algo-text">
+                            The 15-puzzle has over <strong>10.4 trillion reachable states</strong> (\(16! / 2\)). Standard algorithms like Breadth-First Search (BFS) or classic A* exhaust available RAM because they store all generated nodes in an open queue.
+                        </p>
+                        <p class="algo-text">
+                            <strong>IDA* solves this memory bottleneck</strong> by combining the depth-first search's linear memory footprint (\(O(d)\)) with A*'s optimality. It performs successive depth-first iterations, establishing a cutoff bound on \(f(n)\). In each iteration, branches with \(f(n)\) exceeding the cutoff are pruned, guaranteeing an optimal solution with negligible memory consumption.
+                        </p>
+                        <ul class="algo-list">
+                            <li><strong>Space Complexity:</strong> \(O(d)\) — only stores nodes along the current search path.</li>
+                            <li><strong>Time Efficiency:</strong> Iterative bounds avoid expanding excess states.</li>
+                            <li><strong>Completeness:</strong> Guarantees the shortest solution sequence.</li>
+                        </ul>
+                    </div>
+
+                    <div class="algo-card">
+                        <div class="algo-card-badge">Heuristic Function</div>
+                        <h3 class="algo-card-title">Manhattan Distance Heuristic</h3>
+                        <p class="algo-text">
+                            Manhattan Distance measures the grid-based distance between each tile's current coordinate and its destination coordinate in the solved configuration:
+                        </p>
+                        <div class="inline-formula">
+                            h(n) = \sum_{i=1}^{15} \left( |x_i - x_{\text{goal}, i}| + |y_i - y_{\text{goal}, i}| \right)
+                        </div>
+                        <p class="algo-text">
+                            Unlike the basic "Misplaced Tiles" heuristic, Manhattan Distance accounts for the minimum number of single-step moves each tile must physically make across rows and columns.
+                        </p>
+                        <ul class="algo-list">
+                            <li><strong>Admissibility:</strong> It never overestimates the true remaining cost, preserving IDA*'s optimal guarantee.</li>
+                            <li><strong>Consistency (Monotonicity):</strong> For any move from state \(u\) to \(v\), \(h(u) \le \text{cost}(u,v) + h(v)\).</li>
+                            <li><strong>Informed Search:</strong> Drastically prunes unpromising search tree branches.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <span class="logo-tile">1</span>
+                        <span class="logo-tile">5</span>
+                        <span class="footer-title">15-Puzzle AI Solver</span>
+                    </div>
+                    <p class="footer-desc">
+                        A modern college demonstration project showcasing Artificial Intelligence search algorithms, heuristic evaluation, and responsive UI design.
+                    </p>
+                </div>
+
+                <div class="footer-tech-stack">
+                    <span class="tech-title">Technologies Used</span>
+                    <div class="tech-tags">
+                        <span class="tech-tag">HTML5</span>
+                        <span class="tech-tag">CSS3</span>
+                        <span class="tech-tag">JavaScript (ES6+)</span>
+                        <span class="tech-tag">IDA* Algorithm</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="copyright">
+                    &copy; 2026 <strong>15-Puzzle AI Solver</strong>. College Project Presentation.
+                </p>
+                <div class="footer-links">
+                    <a href="#home">Home</a>
+                    <a href="#solver">Solver</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#algorithm">Algorithm</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}15-Puzzle AI - Algorithm & Heuristics Theory{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="breadcrumb">
+        <a href="{{ url_for('home') }}">Home</a> / <span>Algorithm</span>
+    </div>
+    <h1>Search Algorithms & Heuristics</h1>
+    <p class="subtitle">A comprehensive breakdown of Iterative Deepening A* (IDA*), Manhattan Distance, and Linear Conflict heuristics for 15-Puzzle problem solving.</p>
+</section>
+
+<div class="theory-grid">
+
+    <!-- Section 1: IDA* Search -->
+    <article class="card theory-card">
+        <div class="card-header">
+            <span class="card-icon">🧠</span>
+            <h2>Iterative Deepening A* (IDA*)</h2>
+        </div>
+        <p class="theory-intro">
+            IDA* is an informed graph traversal and path search algorithm that combines the space efficiency of Depth-First Search with the optimality and completeness of A* search.
+        </p>
+
+        <div class="formula-box">
+            <code>f(n) = g(n) + h(n)</code>
+        </div>
+
+        <div class="variable-list">
+            <div class="variable-item">
+                <span class="var-badge">g(n)</span>
+                <div>
+                    <strong>Path Cost:</strong> Exact number of sliding moves made from the initial start state to node <em>n</em>.
+                </div>
+            </div>
+            <div class="variable-item">
+                <span class="var-badge">h(n)</span>
+                <div>
+                    <strong>Heuristic Estimate:</strong> An admissible lower bound of the remaining moves to reach the goal configuration.
+                </div>
+            </div>
+            <div class="variable-item">
+                <span class="var-badge">f(n)</span>
+                <div>
+                    <strong>Total Evaluation Function:</strong> The estimated total cost of a path passing through state <em>n</em>.
+                </div>
+            </div>
+        </div>
+
+        <h3 class="theory-subhead">Why IDA* instead of standard A*?</h3>
+        <div class="comparison-table-wrapper">
+            <table class="algo-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Standard A*</th>
+                        <th>IDA* Search</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Space Complexity</strong></td>
+                        <td><span class="bad-stat">O(b<sup>d</sup>)</span> — Rapidly runs out of RAM</td>
+                        <td><span class="good-stat">O(d)</span> — Linear memory footprint</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Time Complexity</strong></td>
+                        <td>O(b<sup>d</sup>)</td>
+                        <td>O(b<sup>d</sup>) (minor overhead from re-expanding)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Optimality</strong></td>
+                        <td>Guaranteed with admissible heuristic</td>
+                        <td>Guaranteed with admissible heuristic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Suitability</strong></td>
+                        <td>8-Puzzle (3x3)</td>
+                        <td>15-Puzzle (4x4) and larger sliding tiles</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+    <!-- Section 2: Manhattan Distance & Linear Conflict -->
+    <article class="card theory-card">
+        <div class="card-header">
+            <span class="card-icon">📏</span>
+            <h2>Heuristic Functions</h2>
+        </div>
+
+        <h3>1. Manhattan Distance (L1 Norm)</h3>
+        <p>The sum of horizontal and vertical distances each tile must travel from its current location to its target goal position:</p>
+        
+        <div class="formula-box formula-small">
+            <code>h<sub>MD</sub> = &sum;<sub>i=1..15</sub> (|row(i) - goalRow(i)| + |col(i) - goalCol(i)|)</code>
+        </div>
+        <p class="theory-note">
+            The empty space (tile 0) is ignored in this summation. Manhattan distance is strictly <strong>admissible</strong> (never overestimates) and <strong>consistent</strong> (monotonic).
+        </p>
+
+        <h3 style="margin-top: 24px;">2. Linear Conflict Heuristic</h3>
+        <p>
+            Two tiles <em>t<sub>j</sub></em> and <em>t<sub>k</sub></em> are in a <strong>Linear Conflict</strong> if they are in the same goal row (or column), both need to end up in that same line, but their current order is reversed.
+        </p>
+        <p>
+            Because tiles cannot jump over one another, one of the two tiles must move out of the line to allow the other to pass, which inevitably adds at least <strong>2 extra moves</strong> per conflict:
+        </p>
+        <div class="formula-box formula-small">
+            <code>h(n) = h<sub>MD</sub>(n) + 2 &times; (Linear Conflicts)</code>
+        </div>
+        <p class="theory-note">
+            Linear Conflict remains strictly <strong>admissible</strong> and dramatically reduces the number of IDA* nodes explored by over 90%.
+        </p>
+    </article>
+
+    <!-- Section 3: Solvability & Inversion Parity -->
+    <article class="card theory-card">
+        <div class="card-header">
+            <span class="card-icon">⚖️</span>
+            <h2>Mathematical Solvability & Parity</h2>
+        </div>
+        <p>
+            Not every random 15-puzzle configuration can be solved! Out of all <strong>16! = 20,922,789,888,000</strong> permutations, exactly <strong>half (50%)</strong> are solvable.
+        </p>
+
+        <div class="rule-box">
+            <h4>The 15-Puzzle Solvability Invariant:</h4>
+            <p>For a 4x4 grid (even width):</p>
+            <ul>
+                <li>If the blank tile is on an <strong>odd row from the bottom</strong> (1st or 3rd), the number of inversions must be <strong>even</strong>.</li>
+                <li>If the blank tile is on an <strong>even row from the bottom</strong> (2nd or 4th), the number of inversions must be <strong>odd</strong>.</li>
+            </ul>
+            <div class="formula-inline">
+                <code>(inversions + blank_row_from_bottom) mod 2 == 1</code>
+            </div>
+        </div>
+
+        <p class="theory-note">
+            Our solver mathematically validates this invariant in <strong>O(N)</strong> time prior to search invocation, instantly detecting impossible puzzles.
+        </p>
+    </article>
+
+    <!-- Section 4: Pseudocode -->
+    <article class="card theory-card">
+        <div class="card-header">
+            <span class="card-icon">💻</span>
+            <h2>IDA* Algorithm Pseudocode</h2>
+        </div>
+
+        <pre class="code-block"><code>function IDA_STAR(root):
+    threshold = h(root)
+    loop:
+        (found, min_excess) = SEARCH(root, g=0, threshold)
+        if found:
+            return solution_path
+        if min_excess == &infin;:
+            return NOT_FOUND
+        threshold = min_excess
+
+function SEARCH(node, g, threshold):
+    f = g + h(node)
+    if f &gt; threshold:
+        return (false, f)
+    if is_goal(node):
+        return (true, f)
+    
+    min_excess = &infin;
+    for each child of node:
+        (found, excess) = SEARCH(child, g + 1, threshold)
+        if found:
+            return (true, excess)
+        min_excess = min(min_excess, excess)
+    
+    return (false, min_excess)</code></pre>
+    </article>
+
+</div>
+{% endblock %}
